@@ -1,1 +1,49 @@
+name: Deploy Idurar to EC2
 
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            cd /home/ec2-user/idurar-erp-crm
+
+            echo "Pulling latest code..."
+            git pull origin master
+
+            echo "Installing backend dependencies..."
+            cd backend
+            npm install
+
+            echo "Restarting backend..."
+            pm2 restart idurar-backend
+
+            echo "Building frontend..."
+            cd ../frontend
+            npm install
+            npm run build
+
+            echo "Deploying frontend..."
+            sudo rm -rf /usr/share/nginx/html/idurar/*
+            sudo cp -r dist/* /usr/share/nginx/html/idurar/
+
+            echo "Testing Nginx..."
+            sudo nginx -t
+
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx
+
+            echo "Deployment completed successfully!"
