@@ -69,22 +69,7 @@ let routes = {
       path: '/invoice/pay/:id',
       element: <InvoiceRecordPayment />,
     },
-    {
-      path: '/quote',
-      element: <Quote />,
-    },
-    {
-      path: '/quote/create',
-      element: <QuoteCreate />,
-    },
-    {
-      path: '/quote/read/:id',
-      element: <QuoteRead />,
-    },
-    {
-      path: '/quote/update/:id',
-      element: <QuoteUpdate />,
-    },
+ 
     {
       path: '/payment',
       element: <Payment />,
@@ -127,3 +112,4 @@ let routes = {
 };
 
 export default routes;
+##
