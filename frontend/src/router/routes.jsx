@@ -91,10 +91,7 @@ let routes = {
       path: '/settings/edit/:settingsKey',
       element: <Settings />,
     },
-    {
-      path: '/payment/mode',
-      element: <PaymentMode />,
-    },
+    
     {
       path: '/taxes',
       element: <Taxes />,
