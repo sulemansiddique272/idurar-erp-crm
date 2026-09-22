@@ -10,33 +10,43 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Deploy application
+      - name: Deploy to EC2
         run: |
-          cd /home/ec2-user/idurar-erp-crm
+          ssh -i "$HOME/.ssh/idurar-server-key.pem" \
+            -o StrictHostKeyChecking=no \
+            ec2-user@16.192.175.225 << 'EOF'
 
-          echo "Pulling latest code..."
-          git pull origin master
+            set -e
 
-          echo "Installing backend dependencies..."
-          cd backend
-          npm install
+            echo "Connected to EC2"
 
-          echo "Restarting backend..."
-          pm2 restart idurar-backend
+            cd /home/ec2-user/idurar-erp-crm
 
-          echo "Building frontend..."
-          cd ../frontend
-          npm install
-          npm run build
+            echo "Pulling latest code..."
+            git pull origin master
 
-          echo "Deploying frontend..."
-          sudo rm -rf /usr/share/nginx/html/idurar/*
-          sudo cp -r dist/* /usr/share/nginx/html/idurar/
+            echo "Installing backend dependencies..."
+            cd backend
+            npm install
 
-          echo "Testing Nginx..."
-          sudo nginx -t
+            echo "Restarting backend..."
+            pm2 restart idurar-backend
 
-          echo "Reloading Nginx..."
-          sudo systemctl reload nginx
+            echo "Building frontend..."
+            cd ../frontend
+            npm install
+            npm run build
 
-          echo "Deployment completed successfully!"
+            echo "Deploying frontend..."
+            sudo rm -rf /usr/share/nginx/html/idurar/*
+            sudo cp -r dist/* /usr/share/nginx/html/idurar/
+
+            echo "Testing Nginx..."
+            sudo nginx -t
+
+            echo "Reloading Nginx..."
+            sudo systemctl reload nginx
+
+            echo "Deployment completed successfully!"
+
+          EOF
